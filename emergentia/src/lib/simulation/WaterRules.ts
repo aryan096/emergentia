@@ -1,6 +1,7 @@
 import type { Grid } from './Grid';
 import { CellType } from './types';
 import { random, isAir, isBlocked } from './RuleUtils';
+import type { SunlightField } from './Sunlight';
 
 /**
  * Water Physics Rules
@@ -21,18 +22,21 @@ import { random, isAir, isBlocked } from './RuleUtils';
 export const WATER_CONFIG = {
 	// Rule 2: Diagonal falling - how often water flows diagonally around obstacles
 	DIAGONAL_PROB: 0.9,
-	
+
 	// Rule 3: Pressure spill - how often water flows toward lower pressure columns
 	PRESSURE_SPILL_PROB: 0.9,
-	
+
 	// Rule 4: Extended horizontal flow - how often water does multi-step side flow
 	EXTENDED_FLOW_PROB: 0.7,
-	
+
 	// Maximum cells water can travel horizontally in one tick (splash distance)
 	MAX_FLOW_DISTANCE: 6,
-	
+
 	// Max depth to check for pressure calculation (performance limit)
 	MAX_PRESSURE_CHECK: 5,
+
+	// Evaporation: fraction of max-sunlight idle surface water that evaporates per tick
+	BASE_EVAP_RATE: 0.005,
 };
 
 /**
@@ -80,7 +84,7 @@ function findFurthestAir(grid: Grid, x: number, y: number, direction: -1 | 1): n
 /**
  * Apply water rules to a single cell
  */
-function applyWaterRules(grid: Grid, x: number, y: number): boolean {
+function applyWaterRules(grid: Grid, x: number, y: number, sunlight: SunlightField): boolean {
 	const cell = grid.get(x, y);
 	if (cell !== CellType.Water) return false;
 	if (grid.wasWritten(x, y)) return false;
@@ -183,7 +187,12 @@ function applyWaterRules(grid: Grid, x: number, y: number): boolean {
 		}
 	}
 	
-	// Rule 5: Idle - mark cell as processed
+	// Rule 5: Idle — check evaporation, then mark cell as processed
+	const light = sunlight.get(x, y);
+	if (light > 0 && random() < light * WATER_CONFIG.BASE_EVAP_RATE) {
+		grid.set(x, y, CellType.Vapor);
+		return true;
+	}
 	grid.set(x, y, CellType.Water);
 	return false;
 }
@@ -192,15 +201,15 @@ function applyWaterRules(grid: Grid, x: number, y: number): boolean {
  * Apply water rules to entire grid
  * Iterates bottom→top with randomized horizontal order per row
  */
-export function applyAllWaterRules(grid: Grid): void {
+export function applyAllWaterRules(grid: Grid, sunlight: SunlightField): void {
 	for (let y = grid.height - 1; y >= 0; y--) {
 		if (random() < 0.5) {
 			for (let x = 0; x < grid.width; x++) {
-				applyWaterRules(grid, x, y);
+				applyWaterRules(grid, x, y, sunlight);
 			}
 		} else {
 			for (let x = grid.width - 1; x >= 0; x--) {
-				applyWaterRules(grid, x, y);
+				applyWaterRules(grid, x, y, sunlight);
 			}
 		}
 	}

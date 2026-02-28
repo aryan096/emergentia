@@ -1,13 +1,15 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { CanvasRenderer, type Grid } from '$lib';
+	import type { SunlightField } from '$lib/simulation/Sunlight';
 
 	interface Props {
 		grid: Grid;
+		sunlight?: SunlightField;
 		targetFPS?: number; // Target frames per second for rendering
 	}
 
-	let { grid, targetFPS = 5 }: Props = $props();
+	let { grid, sunlight, targetFPS = 5 }: Props = $props();
 
 	let canvas: HTMLCanvasElement;
 	let renderer: CanvasRenderer | null = null;
@@ -15,13 +17,13 @@
 
 	onMount(() => {
 		renderer = new CanvasRenderer(canvas, grid.width, grid.height);
-		renderer.render(grid);
-		
+		renderer.render(grid, sunlight);
+
 		// Start fixed-rate render loop (independent of simulation tick rate)
 		const renderIntervalMs = 1000 / targetFPS;
 		renderIntervalId = setInterval(() => {
 			if (renderer) {
-				renderer.render(grid);
+				renderer.render(grid, sunlight);
 			}
 		}, renderIntervalMs);
 	});
@@ -39,7 +41,7 @@
 			const renderIntervalMs = 1000 / targetFPS;
 			renderIntervalId = setInterval(() => {
 				if (renderer) {
-					renderer.render(grid);
+					renderer.render(grid, sunlight);
 				}
 			}, renderIntervalMs);
 		}

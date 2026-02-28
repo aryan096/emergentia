@@ -82,6 +82,20 @@ export function isWater(grid: Grid, x: number, y: number): boolean {
 }
 
 /**
+ * Check if a cell is vapor and not already claimed
+ */
+export function isVapor(grid: Grid, x: number, y: number): boolean {
+	return grid.get(x, y) === CellType.Vapor && !grid.wasWritten(x, y);
+}
+
+/**
+ * Check if a cell is cloud and not already claimed
+ */
+export function isCloud(grid: Grid, x: number, y: number): boolean {
+	return grid.get(x, y) === CellType.Cloud && !grid.wasWritten(x, y);
+}
+
+/**
  * Check if a cell is unclaimed (not written to this tick)
  */
 export function isUnclaimed(grid: Grid, x: number, y: number): boolean {

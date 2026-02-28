@@ -14,3 +14,4 @@ export { RuleEngine, type Rule, type RuleContext } from './simulation/Rules';
 export { CanvasRenderer } from './rendering/CanvasRenderer';
 export { generateWorld, generateTestWorld } from './simulation/WorldGen';
 export { SimplexNoise } from './utils/noise';
+export { SunlightField } from './simulation/Sunlight';

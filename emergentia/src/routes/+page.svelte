@@ -85,7 +85,7 @@
 
 	{#if simulation}
 		{#key gridKey}
-			<SimulationCanvas grid={simulation.grid} {targetFPS} />
+			<SimulationCanvas grid={simulation.grid} sunlight={simulation.sunlight} {targetFPS} />
 		{/key}
 	{:else}
 		<div class="text-gray-400">Initializing simulation...</div>

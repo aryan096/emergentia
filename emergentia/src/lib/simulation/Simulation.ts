@@ -4,6 +4,9 @@ import { TICK_RATE } from './types';
 import { setRandomSeed } from './RuleUtils';
 import { applyAllWaterRules } from './WaterRules';
 import { applyAllAirRules } from './AirRules';
+import { applyAllVaporRules } from './VaporRules';
+import { applyAllCloudRules } from './CloudRules';
+import { SunlightField } from './Sunlight';
 
 export type TickCallback = (tickCount: number) => void;
 
@@ -20,11 +23,18 @@ export class Simulation {
 	private onTick: TickCallback | null = null;
 	private lastTime: number = 0;
 	private accumulator: number = 0;
+	private readonly sunlightField: SunlightField;
 
 	constructor(grid: Grid, tickRate: number = TICK_RATE) {
 		this.grid = grid;
 		this.rules = new RuleEngine();
 		this._tickRate = tickRate;
+		this.sunlightField = new SunlightField(grid.width, grid.height);
+	}
+
+	/** Sunlight field — exposed for the renderer */
+	get sunlight(): SunlightField {
+		return this.sunlightField;
 	}
 
 	/**
@@ -57,27 +67,35 @@ export class Simulation {
 
 	/**
 	 * Perform one simulation tick
-	 * 
+	 *
 	 * UPDATE ORDERING IS CRITICAL:
-	 * 1. Water rules first (bottom→top) - water falls and spreads
-	 * 2. Air rules second (top→bottom) - air rises through water
-	 * 
-	 * If air is updated first, it blocks water collapse.
+	 * 1. Sunlight  — pure top-down propagation, no buffer interaction
+	 * 2. Water     — bottom→top; includes evaporation (needs sunlight)
+	 * 3. Air       — top→bottom; rises through fluid cells
+	 * 4. Vapor     — top→bottom; rises fast, may condense into Cloud
+	 * 5. Cloud     — drift + evaporation; processed after vapor so newly
+	 *                condensed clouds don't immediately drift this tick
 	 */
 	tick(): void {
 		this._tickCount++;
-		
+
 		// Set random seed for this tick (for deterministic-ish behavior)
 		setRandomSeed(this._tickCount);
 
-		// Pass 1: Water rules (bottom→top iteration)
-		applyAllWaterRules(this.grid);
-		
-		// Pass 2: Air rules (top→bottom iteration)
+		// Pass 1: Recompute sunlight (top-down, pure function of grid + tickCount)
+		this.sunlightField.propagate(this.grid, this._tickCount);
+
+		// Pass 2: Water rules (bottom→top) — includes evaporation via sunlightField
+		applyAllWaterRules(this.grid, this.sunlightField);
+
+		// Pass 3: Air rules (top→bottom)
 		applyAllAirRules(this.grid);
-		
-		// Apply any other registered rules (top-down for non-gravity things)
-		// this.rules.applyAll(this.grid);
+
+		// Pass 4: Vapor rules (top→bottom)
+		applyAllVaporRules(this.grid);
+
+		// Pass 5: Cloud rules (drift + evaporation)
+		applyAllCloudRules(this.grid);
 
 		// Swap buffers (next becomes current)
 		this.grid.swap();

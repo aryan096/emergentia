@@ -7,7 +7,9 @@ export enum CellType {
 	Water = 1,
 	Soil = 2,
 	Rock = 3,
-	Stone = 4  // Immovable solid for testing platforms
+	Stone = 4, // Immovable solid for testing platforms
+	Vapor = 5, // Evaporated water, rises to top
+	Cloud = 6  // Condensed vapor; floats, drifts, casts shadow
 }
 
 /**
@@ -20,6 +22,8 @@ export const CELL_DENSITY: Record<CellType, number> = {
 	[CellType.Soil]: 2,
 	[CellType.Rock]: 3,
 	[CellType.Stone]: Infinity,
+	[CellType.Vapor]: 0.0, // Lighter than Air; rises via VaporRules
+	[CellType.Cloud]: 0.0, // Same as vapor; floats via CloudRules
 };
 
 /**
@@ -32,6 +36,8 @@ export const CELL_IS_FLUID: Record<CellType, boolean> = {
 	[CellType.Soil]: false,
 	[CellType.Rock]: false,
 	[CellType.Stone]: false,
+	[CellType.Vapor]: true,  // Air can pass through vapor
+	[CellType.Cloud]: false, // Blocks air and water flow
 };
 
 /**
@@ -51,7 +57,9 @@ export const CELL_REGISTRY: Record<CellType, CellTypeInfo> = {
 	[CellType.Water]: { name: 'Water', color: [30, 144, 255], opacity: 0.3 },
 	[CellType.Soil]: { name: 'Soil', color: [139, 90, 43], opacity: 1 },
 	[CellType.Rock]: { name: 'Rock', color: [105, 105, 105], opacity: 1 },
-	[CellType.Stone]: { name: 'Stone', color: [60, 60, 60], opacity: 1 }
+	[CellType.Stone]: { name: 'Stone', color: [60, 60, 60], opacity: 1 },
+	[CellType.Vapor]: { name: 'Vapor', color: [200, 210, 220], opacity: 0.00 },
+	[CellType.Cloud]: { name: 'Cloud', color: [240, 245, 250], opacity: 0.0005 }
 };
 
 /**

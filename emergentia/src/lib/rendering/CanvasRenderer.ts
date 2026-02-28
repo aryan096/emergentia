@@ -1,5 +1,6 @@
 import type { Grid } from '../simulation/Grid';
 import { CELL_REGISTRY, type CellType } from '../simulation/types';
+import type { SunlightField } from '../simulation/Sunlight';
 
 /**
  * Canvas renderer for the simulation grid
@@ -36,22 +37,33 @@ export class CanvasRenderer {
 	}
 
 	/**
-	 * Render the grid to the canvas
+	 * Render the grid to the canvas.
+	 * When sunlight is provided, cell brightness is modulated by received light.
 	 */
-	render(grid: Grid): void {
+	render(grid: Grid, sunlight?: SunlightField): void {
 		const cells = grid.getCells();
 		const data = this.imageData.data;
 
+		// Minimum brightness so caves aren't pitch black during daytime
+		const AMBIENT = 0.15;
+
 		for (let i = 0; i < cells.length; i++) {
 			const cellType = cells[i] as CellType;
-			const info = CELL_REGISTRY[cellType];
-			const color = info.color;
+			const [r, g, b] = CELL_REGISTRY[cellType].color;
+
+			let brightness = 1.0;
+			if (sunlight) {
+				const x = i % this.width;
+				const y = Math.floor(i / this.width);
+				const light = sunlight.get(x, y);
+				brightness = AMBIENT + (1 - AMBIENT) * light;
+			}
 
 			// Each pixel is 4 bytes: R, G, B, A
 			const pixelIndex = i * 4;
-			data[pixelIndex] = color[0]; // R
-			data[pixelIndex + 1] = color[1]; // G
-			data[pixelIndex + 2] = color[2]; // B
+			data[pixelIndex] = Math.round(r * brightness);
+			data[pixelIndex + 1] = Math.round(g * brightness);
+			data[pixelIndex + 2] = Math.round(b * brightness);
 			// Alpha is already set to 255
 		}
 
