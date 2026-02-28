@@ -12,14 +12,14 @@ import { random, isAir } from './RuleUtils';
  * into a Cloud cell — the seed mechanism for cloud formation.
  */
 
-const VAPOR_RISE_SPEED = 10;
+const VAPOR_RISE_SPEED = 20;
 
 // Minimum vapour neighbours to trigger nucleation (no adjacent cloud)
-const CONDENSE_THRESHOLD = 3;
+const CONDENSE_THRESHOLD = 6;
 // Base condensation rate when threshold met
-const CONDENSE_RATE = 0.02;
+const CONDENSE_RATE = 0.06;
 // Extra condensation rate when touching an existing cloud cell
-const CONDENSE_CLOUD_BOOST = 0.15;
+const CONDENSE_CLOUD_BOOST = 0.25;
 
 /**
  * Count vapor and cloud neighbours in the CURRENT buffer (8-connected).

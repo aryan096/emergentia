@@ -73,12 +73,12 @@ export const TICK_RATE = 60; // Fixed tick rate (matches typical frame rate)
  * World generation constants
  */
 export const WORLD_GEN = {
-	TERRAIN_SCALE: 0.008,        // Noise frequency (lower = smoother)
-	TERRAIN_OCTAVES: 4,          // Fractal noise octaves
-	TERRAIN_BASE: 0.45,          // Base terrain height (% from top)
-	TERRAIN_AMPLITUDE: 0.18,     // Terrain variation (+/- %)
+	TERRAIN_SCALE: 0.8,        // Noise frequency (lower = smoother)
+	TERRAIN_OCTAVES: 20,          // Fractal noise octaves
+	TERRAIN_BASE: 0.3,          // Base terrain height (% from top)
+	TERRAIN_AMPLITUDE: 0.01,     // Terrain variation (+/- %)
 	SOIL_DEPTH_MIN: 30,          // Minimum soil depth
 	SOIL_DEPTH_MAX: 60,          // Maximum soil depth
-	WATER_LEVEL: 0.40,           // Sea level (% from top)
-	CAVE_THRESHOLD: 0.6,         // Threshold for cave formation (future)
+	WATER_LEVEL: 0.30,           // Sea level (% from top)
+	CAVE_THRESHOLD: 0.3,         // Threshold for cave formation (future)
 } as const;

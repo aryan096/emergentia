@@ -18,16 +18,20 @@ import { random, isAir } from './RuleUtils';
  */
 
 // Need this many cloud neighbours to be considered part of a stable mass
-const CLOUD_EVAP_THRESHOLD = 100;
-// Per-tick probability of an under-supported cloud cell reverting to vapour
-const CLOUD_EVAP_RATE = 0.003;
+const CLOUD_EVAP_THRESHOLD = 20;
+// Per-tick probability of an under-supported cloud cell reverting to air
+const CLOUD_EVAP_RATE = 0;
 // Per-tick probability per adjacent vapour cell of absorbing it into the cloud
 // (only applies in the top 25% of the grid)
-const CLOUD_ABSORB_RATE = 0.08;
+const CLOUD_ABSORB_RATE = 0.2;
 // Per-tick probability of drifting one cell sideways
-const CLOUD_DRIFT_RATE = 0.012;
+const CLOUD_DRIFT_RATE = 0.2;
 // Clouds only absorb vapour in this fraction of the grid from the top
 const CLOUD_ZONE = 0.25;
+// Min cloud neighbours for a cell to be able to rain (dense, well-embedded cell)
+const RAIN_THRESHOLD = 5;
+// Per-tick probability of a rain-eligible cloud cell shedding a water droplet
+const RAIN_RATE = 0.05;
 
 /**
  * Count how many of the 8 neighbours are Cloud in the CURRENT buffer.
@@ -52,9 +56,15 @@ function applyCloudRules(grid: Grid, x: number, y: number): void {
 
 	const cloudN = countCloudNeighbours(grid, x, y);
 
-	// Under-supported cells slowly evaporate
+	// Dense cloud cells shed water droplets (rainfall)
+	if (cloudN >= RAIN_THRESHOLD && random() < RAIN_RATE) {
+		grid.setUnclaimed(x, y, CellType.Water);
+		return;
+	}
+
+	// Under-supported cells slowly dissipate into air (no vapor drizzle)
 	if (cloudN < CLOUD_EVAP_THRESHOLD && random() < CLOUD_EVAP_RATE) {
-		grid.set(x, y, CellType.Vapor);
+		grid.setUnclaimed(x, y, CellType.Air);
 		return;
 	}
 
