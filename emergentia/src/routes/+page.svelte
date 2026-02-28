@@ -90,4 +90,6 @@
 	{:else}
 		<div class="text-gray-400">Initializing simulation...</div>
 	{/if}
+
+	<p class="text-sm text-gray-500 italic">Work in progress :)</p>
 </main>
