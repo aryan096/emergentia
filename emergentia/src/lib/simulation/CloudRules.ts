@@ -18,20 +18,20 @@ import { random, isAir } from './RuleUtils';
  */
 
 // Need this many cloud neighbours to be considered part of a stable mass
-const CLOUD_EVAP_THRESHOLD = 20;
+const CLOUD_EVAP_THRESHOLD = 10;
 // Per-tick probability of an under-supported cloud cell reverting to air
 const CLOUD_EVAP_RATE = 0;
 // Per-tick probability per adjacent vapour cell of absorbing it into the cloud
 // (only applies in the top 25% of the grid)
 const CLOUD_ABSORB_RATE = 0.2;
 // Per-tick probability of drifting one cell sideways
-const CLOUD_DRIFT_RATE = 0.2;
+const CLOUD_DRIFT_RATE = 0.1;
 // Clouds only absorb vapour in this fraction of the grid from the top
 const CLOUD_ZONE = 0.25;
 // Min cloud neighbours for a cell to be able to rain (dense, well-embedded cell)
 const RAIN_THRESHOLD = 5;
 // Per-tick probability of a rain-eligible cloud cell shedding a water droplet
-const RAIN_RATE = 0.05;
+const RAIN_RATE = 0.02;
 
 /**
  * Count how many of the 8 neighbours are Cloud in the CURRENT buffer.

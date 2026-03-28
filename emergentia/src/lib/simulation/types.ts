@@ -54,7 +54,7 @@ export interface CellTypeInfo {
  */
 export const CELL_REGISTRY: Record<CellType, CellTypeInfo> = {
 	[CellType.Air]: { name: 'Air', color: [135, 206, 235], opacity: 0 },
-	[CellType.Water]: { name: 'Water', color: [30, 144, 255], opacity: 0.3 },
+	[CellType.Water]: { name: 'Water', color: [30, 144, 255], opacity: 0.01 },
 	[CellType.Soil]: { name: 'Soil', color: [139, 90, 43], opacity: 1 },
 	[CellType.Rock]: { name: 'Rock', color: [105, 105, 105], opacity: 1 },
 	[CellType.Stone]: { name: 'Stone', color: [60, 60, 60], opacity: 1 },
